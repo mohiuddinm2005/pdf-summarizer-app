@@ -1,5 +1,5 @@
 """
-The project will deploy a python script contating the Gemini API. 
+The project will deploy a python script containing the Gemini API. 
 Vercel is deployed via front end with a react base.
 Each pdf file is read in a concise and clean manner
 A fastAPI implementation will be contained and documented below 
