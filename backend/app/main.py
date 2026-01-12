@@ -22,7 +22,7 @@ UPLOAD_DIR = "uploads"
 
 
 # api key 
-client = genai.Client(os.getenv("GENAI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GENAI_API_KEY"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # pdf extraction and parsing into txt format
