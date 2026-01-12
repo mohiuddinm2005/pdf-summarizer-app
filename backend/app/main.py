@@ -8,7 +8,7 @@ A fastAPI implementation will be contained and documented below
 
 "**TESTING BACKEND IMPLEMENTATION FIRST**"
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException 
 from google import genai
 from pypdf import PdfReader
 from pdfminer.high_level import extract_text as fallback_text_extraction
@@ -22,7 +22,7 @@ UPLOAD_DIR = "uploads"
 
 
 # api key 
-client = genai.Client(api_key=os.getenv("GENAI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # pdf extraction and parsing into txt format
@@ -35,18 +35,23 @@ def pdf_extraction(path: str):
         return text.strip()
     except ValueError as exc:
         text = fallback_text_extraction(path)
+        return text.strip()
     
 
 # upload file with this function 
 @app.post("/upload")
-async def pdf_reader_upload(UploadFile = File()):  
+async def pdf_reader_upload(file: UploadFile = File()):  
     
     # save files to path
     file_id = str(uuid.uuid4())
     file_path = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
 
+    # open the file and write the content paths 
     with open(file_path, "wb") as f:
-        f.write(await file.read())
+        content = (await file.read())
+        if not content:
+                raise HTTPException(status_code=400, detail="Uploaded file is empty")
+        f.write(content)
 
     # extraction of the text from pdf_extraction function passing through LLM
     pdf_text = pdf_extraction(file_path)
@@ -65,16 +70,18 @@ async def pdf_reader_upload(UploadFile = File()):
 
     summary = response.text
 
-    # return status of summary and print result 
-    return {"status": "working on it....",
-            "summary": summary}
-    
-    
+    # return JSON status of summary and print result 
+    return {
+            "status": "success",
+            "filename": file.filename,
+            "summary": summary,
+            "text_length": len(pdf_text),
+        }
 
 
 @app.get("/")
 async def root():
-    return {"message": "=== pdf is scanning via API === "}
+    return {"message": "=== GEMINI is running === "}
 
 
 if __name__ == "__main__":
