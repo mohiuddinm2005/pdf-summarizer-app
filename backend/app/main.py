@@ -13,7 +13,7 @@ from google import genai
 from pypdf import PdfReader
 from pdfminer.high_level import extract_text as fallback_text_extraction
 import os 
-import base64
+import uuid
 
 app = FastAPI()        
 pdf_path = ""
