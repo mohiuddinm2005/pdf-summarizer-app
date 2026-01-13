@@ -1,5 +1,5 @@
 """
-The project will deploy a python script containing the Gemini API. 
+The project will deploy a python script contating the Gemini API. 
 Vercel is deployed via front end with a react base.
 Each pdf file is read in a concise and clean manner
 A fastAPI implementation will be contained and documented below 
@@ -8,57 +8,42 @@ A fastAPI implementation will be contained and documented below
 
 "**TESTING BACKEND IMPLEMENTATION FIRST**"
 
-from fastapi import FastAPI, UploadFile, File, HTTPException 
+from fastapi import FastAPI, UploadFile, File
 from google import genai
 from pypdf import PdfReader
 from pdfminer.high_level import extract_text as fallback_text_extraction
 import os 
 import base64
-import uuid
 
-app = FastAPI()
-
-UPLOAD_DIR = "uploads" 
+app = FastAPI()        
+pdf_path = ""
 
 
 # api key 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+client = genai.Client(api_key = "AIzaSyDdHtUezHckjpOLJ4ZkA3jgcBNE3EWsSiI")
+
 
 # pdf extraction and parsing into txt format
-def pdf_extraction(path: str):
-    reader = PdfReader(path)
+def pdf_extraction(pdf_path = str):
+    reader = PdfReader(pdf_path)
     text = ""
     try:
         for page in reader.pages:
             text += page.extract_text()
         return text.strip()
     except ValueError as exc:
-        text = fallback_text_extraction(path)
-        return text.strip()
+        text = fallback_text_extraction(pdf_path)
     
 
 # upload file with this function 
 @app.post("/upload")
-async def pdf_reader_upload(file: UploadFile = File()):  
-    
-    # save files to path
-    file_id = str(uuid.uuid4())
-    file_path = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
-
-    # open the file and write the content paths 
-    with open(file_path, "wb") as f:
-        content = (await file.read())
-        if not content:
-                raise HTTPException(status_code=400, detail="Uploaded file is empty")
-        f.write(content)
+async def pdf_reader_upload(UploadFile = File(pdf_path)):  
 
     # extraction of the text from pdf_extraction function passing through LLM
-    pdf_text = pdf_extraction(file_path)
+    pdf_source = pdf_extraction(pdf_path)
 
-    # read the pdf file content 
-    if not pdf_text:
-        return {"error": "Could not extract text from PDF"}
+    with open(pdf_path, "rb") as f:
+        base64_pdf = base64.b64encode(f.read().decode('utf-8'))
     
 
     response = client.models.generate_content(
@@ -66,22 +51,18 @@ async def pdf_reader_upload(file: UploadFile = File()):
     You need to summarize the contents and give the user key ideas in the pdf. 
     Read the pdf and provide a brief and short explanation to the user. 
     
-    PDF content: {pdf_text[:12000]} """)
+    PDF content: {pdf_source[:12000]} """)
 
     summary = response.text
 
-    # return JSON status of summary and print result 
-    return {
-            "status": "success",
-            "filename": file.filename,
-            "summary": summary,
-            "text_length": len(pdf_text),
-        }
+    # return status of summary and print result 
+    return {"status": "working on it....",
+            "summary": summary}
 
 
 @app.get("/")
 async def root():
-    return {"message": "=== GEMINI is running === "}
+    return {"message": "=== pdf is scanning via API === "}
 
 
 if __name__ == "__main__":
