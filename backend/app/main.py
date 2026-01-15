@@ -51,7 +51,7 @@ async def pdf_reader_upload(file: UploadFile = File()):
     with open(file_path, "wb") as f:
         content = (await file.read())
         if not content:
-                raise HTTPException(status_code=400, detail="Uploaded file is empty")
+                raise HTTPException(status_code = 400, detail = "Uploaded file is empty")
         f.write(content)
 
     # extraction of the text from pdf_extraction function passing through LLM
@@ -61,7 +61,7 @@ async def pdf_reader_upload(file: UploadFile = File()):
     if not pdf_text:
         return {"error": "Could not extract text from PDF"}
     
-    # throws error is api call is not valid
+    # throws error if api call is not valid
     try:
         response = client.models.generate_content(
         model="gemini-2.5-flash", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf.
@@ -72,7 +72,7 @@ async def pdf_reader_upload(file: UploadFile = File()):
 
         summary = response.text
     except Exception as e:
-        raise HTTPException (status_code = 500, detail=f"fatal api crash {e}")
+        raise HTTPException (status_code = 500, detail=f"fatal error {e}")
 
 
     # return JSON status of summary and print result 
