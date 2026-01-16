@@ -21,7 +21,7 @@ app = FastAPI()
 # bridge for fastAPI frontend validation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://your-vercel-domain.vercel.app"],
+    allow_origins=["http://localhost:3000", "https://your-vercel-domain.vercel.app"], # will have to update vercel domain app name
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -47,32 +47,40 @@ def pdf_extraction(path: str):
     except ValueError as exc:
         text = fallback_text_extraction(path)
         return text.strip()
+    
+# cleans PDF after file processing is over    
+def pdf_cleanup(file_path: str):
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            return f"warning could not find file path {e}"
+
 
 
 """ uploads file to gemini API, returns file in JSON format """
 @app.post("/upload")
 async def pdf_reader_upload(file: UploadFile = File(...)):  
-    
-    # save files to path
-    file_id = str(uuid.uuid4())
-    file_path = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
-
-    # open the file and write the content paths 
-    with open(file_path, "wb") as f:
-        content = (await file.read())
-        if not content:
-                raise HTTPException(status_code = 400, detail = "Uploaded file is empty")
-        f.write(content)
-
-    # extraction of the text from pdf_extraction function passing through LLM
-    pdf_text = pdf_extraction(file_path)
-
-    # read the pdf file content 
-    if not pdf_text:
-        raise HTTPException(status_code=422, detail="cannot extract PDF text")
-    
-    # throws error if api call is not valid
     try:
+        # save files to path
+        file_id = str(uuid.uuid4())
+        file_path = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
+
+        # open the file and write the content paths 
+        with open(file_path, "wb") as f:
+            content = (await file.read())
+            if not content:
+                    raise HTTPException(status_code = 400, detail = "Uploaded file is empty")
+            f.write(content)
+
+        # extraction of the text from pdf_extraction function passing through LLM
+        pdf_text = pdf_extraction(file_path)
+
+        # read the pdf file content 
+        if not pdf_text:
+            raise HTTPException(status_code=422, detail="cannot extract PDF text")
+        
+        # throws error if api call is not valid
         response = client.models.generate_content(
         model="gemini-2.5-flash", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf. 
         Analyze this PDF and provide:
@@ -84,29 +92,19 @@ async def pdf_reader_upload(file: UploadFile = File(...)):
         PDF content: {pdf_text[:15000]} """)
 
         summary = response.text
-
+        # return JSON status of summary and print result 
+        return {
+                "status": "success",
+                "filename": file.filename,
+                "summary": summary,
+                "text_length": len(pdf_text),
+            }
     except Exception as e:
-        raise HTTPException (status_code = 500, detail=f"Gemini API fatal error {e}")
-
+                raise HTTPException (status_code = 500, detail=f"Gemini API fatal error {e}")
     finally:
-        pdf_cleanup(file_path)
-        
-    # return JSON status of summary and print result 
-    return {
-            "status": "success",
-            "filename": file.filename,
-            "summary": summary,
-            "text_length": len(pdf_text),
-        }
-    
+            pdf_cleanup(file_path)
+                
 
-def pdf_cleanup(file_path: str):
-    if os.path.exists(pdf_reader_upload):
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            return f"warning could not find file path {e}"
-    
 
 @app.get("/")
 async def root():
