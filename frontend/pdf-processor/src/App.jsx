@@ -4,12 +4,12 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  VITE_API_URL=http://localhost:8000;
 
   return (
     <>
       <div>
-        <
+    
       </div>
       <h1>Vite + React</h1>
 

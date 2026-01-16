@@ -14,8 +14,18 @@ from pypdf import PdfReader
 from pdfminer.high_level import extract_text as fallback_text_extraction
 import os 
 import uuid
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# bridge for fastAPI frontend validation
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "https://your-vercel-domain.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 UPLOAD_DIR = "uploads" 
 
@@ -37,11 +47,11 @@ def pdf_extraction(path: str):
     except ValueError as exc:
         text = fallback_text_extraction(path)
         return text.strip()
-    
 
-# upload file with this function 
+
+""" uploads file to gemini API, returns file in JSON format """
 @app.post("/upload")
-async def pdf_reader_upload(file: UploadFile = File()):  
+async def pdf_reader_upload(file: UploadFile = File(...)):  
     
     # save files to path
     file_id = str(uuid.uuid4())
@@ -59,22 +69,28 @@ async def pdf_reader_upload(file: UploadFile = File()):
 
     # read the pdf file content 
     if not pdf_text:
-        return {"error": "Could not extract text from PDF"}
+        raise HTTPException(status_code=422, detail="cannot extract PDF text")
     
     # throws error if api call is not valid
     try:
         response = client.models.generate_content(
-        model="gemini-2.5-flash", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf.
-        You need to summarize the contents and give the user key ideas in the pdf. 
-        Read the pdf and provide a brief and short explanation to the user. 
-        
-        PDF content: {pdf_text[:12000]} """)
+        model="gemini-2.5-flash", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf. 
+        Analyze this PDF and provide:
+
+        1. A concise summary (2-3 paragraphs)
+        2. Key topics and main ideas
+        3. Important takeaways
+
+        PDF content: {pdf_text[:15000]} """)
 
         summary = response.text
+
     except Exception as e:
-        raise HTTPException (status_code = 500, detail=f"fatal error {e}")
+        raise HTTPException (status_code = 500, detail=f"Gemini API fatal error {e}")
 
-
+    finally:
+        pdf_cleanup(file_path)
+        
     # return JSON status of summary and print result 
     return {
             "status": "success",
@@ -82,13 +98,22 @@ async def pdf_reader_upload(file: UploadFile = File()):
             "summary": summary,
             "text_length": len(pdf_text),
         }
+    
 
+def pdf_cleanup(file_path: str):
+    if os.path.exists(pdf_reader_upload):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            return f"warning could not find file path {e}"
+    
 
 @app.get("/")
 async def root():
-    return {"message": "=== GEMINI is running === "}
-
+    return {"message": "=== GEMINI is running === ",
+            "Status": "Healthy"
+    }
 
 if __name__ == "__main__":
     import uvicorn 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
