@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  VITE_API_URL=http://localhost:8000;
+  VITE_API_URL=http;//localhost:8000;
 
   return (
     <>

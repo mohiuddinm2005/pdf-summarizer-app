@@ -48,6 +48,7 @@ def pdf_extraction(path: str):
         text = fallback_text_extraction(path)
         return text.strip()
     
+    
 # cleans PDF after file processing is over    
 def pdf_cleanup(file_path: str):
     if os.path.exists(file_path):
@@ -114,4 +115,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn 
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
