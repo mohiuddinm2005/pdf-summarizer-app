@@ -77,7 +77,7 @@ async def pdf_reader_upload(file: UploadFile = File(...)):
         # extraction of the text from pdf_extraction function passing through LLM
         pdf_text = pdf_extraction(file_path)
 
-        # read the pdf file content 
+        # catches if pdf text is not extractable 
         if not pdf_text:
             raise HTTPException(status_code=422, detail="cannot extract PDF text")
         
