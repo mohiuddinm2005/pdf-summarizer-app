@@ -21,7 +21,7 @@ app = FastAPI()
 # bridge for fastAPI frontend validation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://your-vercel-domain.vercel.app"], # will have to update vercel domain app name
+    allow_origins=["http://localhost:3000", "https://ai-gateway.vercel.sh/v1"], # will have to update vercel domain app name
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
