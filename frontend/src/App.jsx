@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 export default function App() {
@@ -10,5 +8,6 @@ export default function App() {
         Tailwind v4 is working 🚀
       </h1>
     </div>
-  );
-}
+)}
+
+console.log("API URL:", import.meta.env.VITE_API_URL);
