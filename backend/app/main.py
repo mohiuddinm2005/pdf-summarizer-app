@@ -6,7 +6,7 @@ A fastAPI implementation will be contained and documented below
 
 """
 
-"**TESTING BACKEND IMPLEMENTATION FIRST**"
+"**FLASH**"
 
 from fastapi import FastAPI, UploadFile, File, HTTPException 
 from google import genai
@@ -21,7 +21,7 @@ app = FastAPI()
 # bridge for fastAPI frontend validation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://ai-gateway.vercel.sh/v1"], # will have to update vercel domain app name
+    allow_origins=["http://localhost:3000", "https://ai-gateway.vercel.sh/v1"], # USING RAILWAY INSTEAD TO DEPLOY
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -111,6 +111,13 @@ async def pdf_reader_upload(file: UploadFile = File(...)):
 async def root():
     return {"message": "=== GEMINI is running === ",
             "Status": "Healthy"
+    }
+@app.get("/health")
+async def check_health():
+    """Checking health checkpoint endpoint"""
+    return {
+         "status:": "healthy",
+         "service": "Flash PDF summarizer app"
     }
 
 if __name__ == "__main__":
