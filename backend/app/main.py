@@ -20,7 +20,7 @@ app = FastAPI()
 
 # bridge for fastAPI frontend validation
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,     # need railway app to host 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]

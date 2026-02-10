@@ -6,8 +6,6 @@ A modern, full-stack application that uses Google's Gemini AI to generate intell
 
 - **Drag & Drop Upload**: Intuitive file upload with drag-and-drop support
 - **AI-Powered Analysis**: Leverages Google Gemini 2.5 Flash for smart summarization
-- **Clean UI**: Modern, responsive design built with React and Tailwind CSS
-- **Fast Processing**: Quick PDF text extraction and summary generation
 - **Error Handling**: Comprehensive error messages and loading states
 - **Lightweight**: Optimized build for fast deployment and performance
 
