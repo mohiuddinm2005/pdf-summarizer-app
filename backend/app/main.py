@@ -21,7 +21,6 @@ app = FastAPI()
 # bridge for fastAPI frontend validation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://ai-gateway.vercel.sh/v1"], # USING RAILWAY INSTEAD TO DEPLOY
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
