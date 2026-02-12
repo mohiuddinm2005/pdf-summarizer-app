@@ -1,33 +1,109 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { useFileValidation } from './hooks/useFileValidation';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { useAPIHandler } from './hooks/useAPIHandler';
 import { useReset } from './hooks/useReset';
+import { logger } from './utils/logger'; // Import the new logger
 
 function App() {
-  // file validation
+  // --- Initialization Logging ---
+  useEffect(() => {
+    logger.info('Application Mounted: Flash API Summarizer');
+    logger.debug('Environment', { env: process.env.NODE_ENV });
+  }, []);
+
+  // --- Hooks ---
   const {
     file, setFile, error, setError, summary, setSummary, handleFileSelect
   } = useFileValidation();
 
-  // Drag and drop hook
+  // Wrap file selection to log the specific file details immediately
+  const handleFileSelectWrapper = useCallback((selectedFile) => {
+    if (selectedFile) {
+      logger.info('File Selection Event', { 
+        name: selectedFile.name, 
+        type: selectedFile.type, 
+        size: `${(selectedFile.size / 1024).toFixed(2)} KB` 
+      });
+    } else {
+      logger.warn('File Selection Event triggered with null file');
+    }
+    handleFileSelect(selectedFile);
+  }, [handleFileSelect]);
+
   const {
     isDragging,
     handleDragOver,
     handleDragLeave,
     handleDrop
-  } = useDragAndDrop(handleFileSelect);
+  } = useDragAndDrop(handleFileSelectWrapper);
 
-  // api handler hook
   const { loading, handleProcessPDF } = useAPIHandler();
+  const handleResetHook = useReset(setFile, setSummary, setError);
 
-  //reset handling
-  const handleReset = useReset(setFile, setSummary, setError)
+  // --- State Monitoring & Debugging ---
+  
+  // Monitor File State
+  useEffect(() => {
+    if (file) {
+      logger.debug('State Update: File set successfully', { name: file.name });
+    }
+  }, [file]);
 
+  // Monitor Error State (Auto-log any errors that appear in UI)
+  useEffect(() => {
+    if (error) {
+      logger.error('UI Error Displayed', error);
+    }
+  }, [error]);
+
+  // Monitor Summary State
+  useEffect(() => {
+    if (summary) {
+      logger.info('Summary Generation Complete', { length: summary.length });
+    }
+  }, [summary]);
+
+
+  // --- Event Handlers with Logging ---
+
+  const onProcessClick = async () => {
+    if (!file) {
+      logger.warn('Generate clicked without file present');
+      return;
+    }
+
+    logger.info('Starting PDF Processing...', { fileName: file.name });
+    
+    try {
+      await handleProcessPDF(file, setError, setSummary);
+    } catch (err) {
+      logger.error('CRITICAL: Uncaught error in Process Click Handler', err);
+      setError('An unexpected error occurred. Please check console logs.');
+    }
+  };
+
+  const onResetClick = () => {
+    logger.info('User initiated Reset');
+    try {
+      handleResetHook();
+      logger.debug('Reset completed successfully');
+    } catch (err) {
+      logger.error('Error during reset sequence', err);
+    }
+  };
+
+  const onManualFileUpload = (e) => {
+    logger.debug('Manual file input changed');
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelectWrapper(e.target.files[0]);
+    }
+  };
+
+  // --- Render ---
   return (
     <div className="App">
-      {/* Header with gradient title */}
       <header className="app-header">
         <h1 className="app-title">Flash API Summarizer</h1>
       </header>
@@ -37,19 +113,27 @@ function App() {
         <div className="upload-section">
           <h2>Upload PDF</h2>
           
-          {/* Drag and Drop Zone */}
           <div
             className={`upload-box ${isDragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
-            onDragOver={handleDragOver}
+            onDragOver={(e) => {
+              // Optional: Log drag over only once per sec to avoid spam, or keep silent
+              handleDragOver(e);
+            }}
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById('file-input').click()}
+            onDrop={(e) => {
+              logger.debug('Drop event detected');
+              handleDrop(e);
+            }}
+            onClick={() => {
+              logger.debug('Upload box clicked');
+              document.getElementById('file-input').click();
+            }}
           >
             <input
               id="file-input"
               type="file"
               accept="application/pdf"
-              onChange={(e) => handleFileSelect(e.target.files[0])}
+              onChange={onManualFileUpload}
               style={{ display: 'none' }}
             />
             
@@ -72,11 +156,10 @@ function App() {
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="button-group">
             <button
               className="btn btn-primary"
-              onClick={() => handleProcessPDF(file, setError, setSummary)}
+              onClick={onProcessClick}
               disabled={!file || loading}
             >
               {loading ? 'Processing...' : 'Generate Summary'}
@@ -85,7 +168,7 @@ function App() {
             {file && (
               <button
                 className="btn btn-secondary"
-                onClick={handleReset}
+                onClick={onResetClick}
                 disabled={loading}
               >
                 Reset
@@ -93,7 +176,6 @@ function App() {
             )}
           </div>
 
-          {/* Error Display */}
           {error && (
             <div className="error-message">
               <svg viewBox="0 0 24 24" fill="currentColor">
