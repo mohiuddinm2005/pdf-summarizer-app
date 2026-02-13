@@ -6,7 +6,7 @@ A modern, full-stack application that uses Google's Gemini AI to generate intell
 
 - **Drag & Drop Upload**: Intuitive file upload with drag-and-drop support
 - **AI-Powered Analysis**: Leverages Google Gemini 2.5 Flash for smart summarization
-- **Error Handling**: Comprehensive error messages and loading states
+- **Error Handling and logging**: Comprehensive error messages and loading states
 - **Lightweight**: Optimized build for fast deployment and performance
 
 ## 🛠️ Tech Stack
@@ -15,7 +15,7 @@ A modern, full-stack application that uses Google's Gemini AI to generate intell
 
 - **React 18** - UI framework
 - **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling
+- **CSS** - Normal style sheets
 - **Lucide React** - Icon library
 
 ### Backend
@@ -84,7 +84,7 @@ The API will be available at `http://localhost:8000`
 
 ## 🚢 Deployment
 
-### Deploy to Railway (Recommended)
+### Deploy to Railway (OPTIONAL)
 
 Railway provides a seamless deployment experience for full-stack applications with both frontend and backend.
 
@@ -100,13 +100,13 @@ Railway provides a seamless deployment experience for full-stack applications wi
 3. **Deploy Frontend**:
    - New Service in same project
    - Add environment variable: `VITE_API_URL` (your backend URL)
-   - Railway auto-detects and deploys Vite
+   - (OPTIONAL DEPLOYMENT WITH RAILWAY) Railway auto-detects and deploys Vite
 
 4. **Update CORS**: Add frontend URL to backend's `allow_origins`
 
 **Detailed Guide**: See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
 
-#### Using Railway CLI:
+#### Using Railway CLI (OPTIONAL IF DEPLOYMENT IS WITH RAILWAY):
 
 ```bash
 # Install CLI
@@ -175,7 +175,7 @@ Update the header section in `App.jsx` to change the app name, icon, and descrip
 The backend is configured to accept requests from:
 
 - `http://localhost:3000` (development)
-- `https://*.up.railway.app` (Railway deployments)
+- `https://*.up.railway.app` (Railway deployments, OPTIONAL)
 
 Update the `allow_origins` list in `main.py` to include your specific Railway frontend URL after deployment.
 
