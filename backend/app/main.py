@@ -16,7 +16,9 @@ import uuid
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-origins = ["http://localhost:3000"]
+
+# ports where localhost is running via react app
+origins = ["http://localhost:3000", "http://localhost:5173"]
 
 # bridge for fastAPI frontend validation
 app.add_middleware(

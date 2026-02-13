@@ -10,7 +10,7 @@ function App() {
   // --- Initialization Logging ---
   useEffect(() => {
     logger.info('Application Mounted: Flash API Summarizer');
-    logger.debug('Environment', { env: process.env.NODE_ENV });
+    logger.debug('App initialized successfully.'); 
   }, []);
 
   // --- Hooks ---
@@ -105,7 +105,8 @@ function App() {
   return (
     <div className="App">
       <header className="app-header">
-        <h1 className="app-title">Flash API Summarizer</h1>
+        <h1 className="app-title">Flash API</h1> 
+        <h1 className="app-logo">⚡</h1>  
       </header>
 
       <div className="main-container">
