@@ -2,5 +2,9 @@
     "python-envs.pythonProjects": [],
     "css.lint.unknownAtRules": "ignore",
     "scss.lint.unknownAtRules": "ignore",
-    "less.lint.unknownAtRules": "ignore"
+    "less.lint.unknownAtRules": "ignore",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "cSpell.words": [
+        "genai"
+    ]
 }
