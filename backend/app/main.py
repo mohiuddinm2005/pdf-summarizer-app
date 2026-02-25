@@ -5,8 +5,6 @@ A fastAPI implementation will be contained and documented below
 
 """
 
-"**FLASH API NAME OF PRODUCT**"
-
 from fastapi import FastAPI, UploadFile, File, HTTPException 
 from google import genai
 from pypdf import PdfReader
