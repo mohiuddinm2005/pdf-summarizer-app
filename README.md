@@ -65,7 +65,7 @@ The app will be available at `http://localhost:3000`
 1. **Install Python dependencies:**
 
 ```bash
-pip install fastapi uvicorn google-generativeai pypdf pdfminer.six python-multipart
+pip install -r requirements.txt
 ```
 
 2. **Set environment variable:**
@@ -84,54 +84,39 @@ The API will be available at `http://localhost:8000`
 
 ## 🚢 Deployment
 
-### Deploy to Railway (OPTIONAL)
+### Deploy to Vercel & Render
 
-Railway provides a seamless deployment experience for full-stack applications with both frontend and backend.
+Frontend and backend deployment on reliable, scalable platforms with generous free tiers.
 
-#### Quick Deploy:
+#### Frontend Deployment (Vercel):
 
-1. **Create Railway Account**: Visit [railway.app](https://railway.app)
+1. **Connect repository** to Vercel
+2. **Set environment variable**: `VITE_API_URL` (your backend URL)
+3. Deploy automatically on push
 
-2. **Deploy Backend**:
-   - New Project → Deploy from GitHub
-   - Add environment variable: `GEMINI_API_KEY`
-   - Railway auto-detects and deploys FastAPI
+#### Backend Deployment (Render):
 
-3. **Deploy Frontend**:
-   - New Service in same project
-   - Add environment variable: `VITE_API_URL` (your backend URL)
-   - (OPTIONAL DEPLOYMENT WITH RAILWAY) Railway auto-detects and deploys Vite
+1. **Create Render Account**: Visit [render.com](https://render.com)
+2. **New Web Service** → Connect GitHub repository
+3. **Configure**:
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
+4. **Add environment variable**: `GEMINI_API_KEY`
+5. Update `VITE_API_URL` on Vercel with your Render backend URL
 
-4. **Update CORS**: Add frontend URL to backend's `allow_origins`
-
-**Detailed Guide**: See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
-
-#### Using Railway CLI (OPTIONAL IF DEPLOYMENT IS WITH RAILWAY):
-
-```bash
-# Install CLI
-npm i -g @railway/cli
-
-# Login
-railway login
-
-# Initialize and deploy
-railway init
-railway up
-```
+**Detailed Guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Alternative Deployment Options
 
-#### Render
+#### Docker Deployment
 
-- Connect GitHub repository
-- Set build command: `npm install && npm run build`
-- Set start command: `npm run start`
+- Build containerized app for any platform
+- Consistent environment across development and production
 
-#### Heroku
+#### Self-Hosted
 
-- Requires `Procfile` (included)
-- Deploy via Git push or GitHub integration
+- Deploy on AWS, GCP, or Azure
+- Full control over infrastructure and scaling
 
 ## 📁 Project Structure
 
@@ -147,6 +132,7 @@ flash-pdf-summarizer/
 ├── tailwind.config.js    # Tailwind CSS config
 ├── postcss.config.js     # PostCSS config
 ├── vercel.json           # Vercel deployment config
+├── requirements.txt      # Python dependencies
 └── .env.example          # Environment variables template
 ```
 
@@ -160,7 +146,7 @@ flash-pdf-summarizer/
 
 ### Update API Endpoint
 
-Edit `App.jsx` and change the `API_URL` constant or set the `REACT_APP_API_URL` environment variable.
+Edit `App.jsx` and change the `API_URL` constant or set the `VITE_API_URL` environment variable.
 
 ### Modify Tailwind Theme
 
@@ -175,9 +161,8 @@ Update the header section in `App.jsx` to change the app name, icon, and descrip
 The backend is configured to accept requests from:
 
 - `http://localhost:3000` (development)
-- `https://*.up.railway.app` (Railway deployments, OPTIONAL)
-
-Update the `allow_origins` list in `main.py` to include your specific Railway frontend URL after deployment.
+- Your deployed Vercel frontend URL
+- Add additional origins as needed in `main.py`
 
 ## 📊 Performance Optimizations
 
@@ -197,21 +182,21 @@ Update the `allow_origins` list in `main.py` to include your specific Railway fr
 
 ### File Upload Issues
 
-- Check file size limits (Railway has generous limits)
+- Check file size limits
 - Verify PDF file is valid and not corrupted
 - Ensure backend has write permissions for `uploads/` directory
 
 ### API Key Issues
 
-- Verify `GEMINI_API_KEY` is set in Railway environment variables
+- Verify `GEMINI_API_KEY` is set in deployment environment variables
 - Check API key has proper permissions
 - Ensure you're not exceeding API rate limits
 
 ### Environment Variables Not Loading
 
-- Use `VITE_` prefix (not `REACT_APP_`)
+- Use `VITE_` prefix for frontend
 - Restart dev server after changing `.env`
-- Redeploy on Railway after updating variables
+- Redeploy after updating environment variables
 
 ## 📝 License
 
