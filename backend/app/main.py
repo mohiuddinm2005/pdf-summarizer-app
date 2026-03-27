@@ -83,7 +83,7 @@ async def pdf_reader_upload(file: UploadFile = File(...)):
         
         # throws error if api call is not valid
         response = client.models.generate_content(
-        model="gemini-2.5-flash", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf. 
+        model="gemini-3-flash-preview", contents = f""" You are a sophisticated model designed to summarize, deduce, and breakdown a pdf. 
         Analyze this PDF and provide:
 
         1. A concise summary (2-3 paragraphs)
