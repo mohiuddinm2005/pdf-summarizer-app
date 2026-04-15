@@ -20,7 +20,7 @@ origins = ["http://localhost:3000", "http://localhost:5173"]
 
 # bridge for fastAPI frontend validation
 app.add_middleware(
-    CORSMiddleware,     # need railway app to host 
+    CORSMiddleware,     # need vercel hosting to run application
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
