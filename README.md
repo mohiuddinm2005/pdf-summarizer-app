@@ -5,7 +5,7 @@ A modern, full-stack application that uses Google's Gemini AI to generate intell
 ## 🚀 Features
 
 - **Drag & Drop Upload**: Intuitive file upload with drag-and-drop support
-- **AI-Powered Analysis**: Leverages Google Gemini 2.5 Flash for smart summarization
+- **AI-Powered Analysis**: Leverages Google Gemini 3.0 for smart summarization
 - **Error Handling and logging**: Comprehensive error messages and loading states
 - **Lightweight**: Optimized build for fast deployment and performance
 
