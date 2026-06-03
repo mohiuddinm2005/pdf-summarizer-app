@@ -1,0 +1,22 @@
+# Backend directory - not needed for Vercel frontend deployment
+backend/
+
+# Python files
+*.py
+*.pyc
+requirements.txt
+Procfile
+runtime.txt
+.railwayignore
+
+# Git files
+.git
+.gitignore
+.github/
+
+# Documentation
+DEPLOYMENT.md
+
+# Root level environment files
+.env
+.env.local

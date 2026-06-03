@@ -15,12 +15,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ports where localhost is running via react app
-origins = ["http://localhost:3000", "http://localhost:5173"]
+# Configure CORS origins from environment variable
+# Format: comma-separated list (e.g., "http://localhost:3000,https://app.vercel.app")
+# Defaults to localhost for development
+allowed_origins_env = os.getenv(
+    "ALLOWED_ORIGINS", 
+    "http://localhost:3000,http://localhost:5173"
+)
+origins = [origin.strip() for origin in allowed_origins_env.split(",")]
 
-# bridge for fastAPI frontend validation
+# CORS middleware for frontend communication
 app.add_middleware(
-    CORSMiddleware,     # need vercel hosting to run application
+    CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
@@ -122,4 +128,6 @@ async def check_health():
 
 if __name__ == "__main__":
     import uvicorn 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Use PORT environment variable (set by Railway) or default to 8000
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
