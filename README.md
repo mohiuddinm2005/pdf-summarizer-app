@@ -84,27 +84,65 @@ The API will be available at `http://localhost:8000`
 
 ## 🚢 Deployment
 
-### Deploy to Vercel & Render
+### Deploy to Vercel (Frontend) & Railway (Backend)
 
-Frontend and backend deployment on reliable, scalable platforms with generous free tiers.
+Full-stack deployment on reliable, scalable platforms.
 
 #### Frontend Deployment (Vercel):
 
-1. **Connect repository** to Vercel
-2. **Set environment variable**: `VITE_API_URL` (your backend URL)
-3. Deploy automatically on push
+1. **Connect Repository**:
+   - Go to [vercel.com](https://vercel.com) and sign in
+   - Click "Add New" → "Project"
+   - Import your GitHub repository
 
-#### Backend Deployment (Render):
+2. **Configure Build Settings**:
+   - Framework: **Vite**
+   - Build Command: `npm run build` (auto-detected)
+   - Output Directory: `dist` (auto-detected)
+   - Install Command: `npm ci`
 
-1. **Create Render Account**: Visit [render.com](https://render.com)
-2. **New Web Service** → Connect GitHub repository
-3. **Configure**:
-   - Build command: `pip install -r requirements.txt`
-   - Start command: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
-4. **Add environment variable**: `GEMINI_API_KEY`
-5. Update `VITE_API_URL` on Vercel with your Render backend URL
+3. **Set Environment Variables**:
+   - Add `VITE_API_URL` = `https://your-railway-backend-url.railway.app`
+   - (Get Railway URL from Railway dashboard after backend deployment)
 
-**Detailed Guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
+4. **Deploy**:
+   - Click "Deploy"
+   - Auto-deploys on every push to main branch
+
+#### Backend Deployment (Railway):
+
+1. **Create Railway Account**: Visit [railway.app](https://railway.app)
+
+2. **Create New Project**:
+   - Click "Create a new project"
+   - Select "Deploy from GitHub repo"
+   - Connect your GitHub account and select this repository
+
+3. **Configure Railway Service**:
+   - Railway auto-detects `Procfile`
+   - Build Command: Auto (installs from `requirements.txt`)
+   - Start Command: Auto (uses `Procfile`)
+
+4. **Set Environment Variables** in Railway Dashboard:
+   - `GEMINI_API_KEY` = your Google Gemini API key
+   - `PORT` = 8000 (Railway auto-sets this)
+
+5. **Deploy**:
+   - Railway auto-deploys on push
+   - View deployment logs in Railway dashboard
+
+6. **Get Backend URL**:
+   - Copy public URL from Railway dashboard
+   - Update `VITE_API_URL` on Vercel with this URL
+   - Redeploy frontend on Vercel
+
+**Deployment Configuration Files**:
+
+- `frontend/vercel.json` - Vercel build configuration
+- `backend/Procfile` - Railway start command
+- `backend/runtime.txt` - Python version specification
+- `.vercelignore` - Files to exclude from Vercel
+- `backend/.railwayignore` - Files to exclude from Railway
 
 ### Alternative Deployment Options
 
