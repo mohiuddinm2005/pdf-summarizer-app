@@ -20,7 +20,7 @@ app = FastAPI()
 # Defaults to localhost for development
 allowed_origins_env = os.getenv(
     "ALLOWED_ORIGINS", 
-    "http://localhost:3000,http://localhost:5173"
+    "https://pdf-summarizer-doxrwmkkr-mohiuddinm2005s-projects.vercel.app/"
 )
 origins = [origin.strip() for origin in allowed_origins_env.split(",")]
 
